@@ -76,11 +76,25 @@ impl TransactionLog {
                 self.tail.take();
             }
             self.length -= 1;
-            Rc::try_unwrap(head)
-                .ok()
+                                 // head is Rc<RefCell<Node>>
+                                 //
+            Rc::try_unwrap(head) // >>> fn try_unwrap<T>(rc: Rc<T>) -> Result<T, Rc<T>>
+                                 // Unwraps the contained value if the Rc<T> is unique.
+                                 // If it is not unique, return self.
+                                 // now, it returns Result<RefCell<Node>>
+                                 //
+                .ok()            // >>> fn ok(self) -> Option<T>
+                                 // now, it returns Option<RefCell<Node>>
+                                 //
                 .expect("Something is terribly wrong")
-                .into_inner()
-                .value
+                                 // >>> fn expect(self, msg: &str) -> T
+                                 // Panics if the value is a None with a custom panic message provided by msg.
+                                 // now, it returns RefCell<Node>
+                                 //
+                .into_inner()    // >>> fn into_inner(self) -> T
+                                 // now, it returns Node
+                                 //
+                .value           // Node.value: String
         })
     }
 }
